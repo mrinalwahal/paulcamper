@@ -14,4 +14,6 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	s := NewService()
 	fmt.Println(s.Translate(ctx, language.English, language.Japanese, "test"))
+	fmt.Println(s.Translate(ctx, language.English, language.Japanese, "test"))
+	fmt.Println(s.Translate(ctx, language.English, language.Japanese, "test"))
 }

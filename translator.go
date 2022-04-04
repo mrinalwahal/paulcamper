@@ -23,6 +23,7 @@ type randomTranslator struct {
 	minDelay  time.Duration
 	maxDelay  time.Duration
 	errorProb float64
+	cache     *localCache
 }
 
 func newRandomTranslator(minDelay, maxDelay time.Duration, errorProbability float64) *randomTranslator {
@@ -30,6 +31,7 @@ func newRandomTranslator(minDelay, maxDelay time.Duration, errorProbability floa
 		minDelay:  minDelay,
 		maxDelay:  maxDelay,
 		errorProb: errorProbability,
+		cache:     newLocalCache(10),
 	}
 }
 
@@ -39,10 +41,28 @@ func (t randomTranslator) Translate(ctx context.Context, from, to language.Tag, 
 	time.Sleep(t.randomDuration())
 
 	if rand.Float64() < t.errorProb {
+		//	t.Translate(ctx, from, to, data)
 		return "", errors.New("translation failed")
 	}
 
+	//	Search in cache
+	if cachedResult, err := t.cache.read(request{
+		to:   to,
+		from: from,
+		data: data,
+	}); err == nil {
+		return cachedResult.result + " [cached]", err
+	}
+
 	res := fmt.Sprintf("%v -> %v : %v -> %v", from, to, data, strconv.FormatInt(rand.Int63(), 10))
+
+	//	Add the reqest and result to cache
+	t.cache.update(request{
+		to:   to,
+		from: from,
+		data: data,
+	}, res, 10)
+
 	return res, nil
 }
 

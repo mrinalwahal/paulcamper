@@ -1,5 +1,5 @@
-module github.com/pailcamper/pc-offline-challenge
+module github.com/mrinalwahal/safety-proxy
 
-go 1.12
+go 1.16
 
-require golang.org/x/text v0.3.2
+require golang.org/x/text v0.3.7
